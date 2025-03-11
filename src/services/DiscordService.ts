@@ -129,8 +129,8 @@ export class DiscordService {
 
       ticket.similarTickets.slice(0, 5).forEach((similarTicket, index) => {
         similarTicketsEmbed.addFields({
-          name: `Ticket Similar #${index + 1}`,
-          value: `[Link para o tópico](https://discord.com/channels/${Config.DISCORD_GUILD_ID}/${similarTicket.threadId})\nSimilaridade: ${(similarTicket.similarity * 100).toFixed(2)}%`,
+          name: `👉 Ticket Similar #${index + 1}`,
+          value: `[Link para o tópico](https://discord.com/channels/${Config.DISCORD_GUILD_ID}/${similarTicket.threadId})\n⚡ Similaridade: ${(similarTicket.similarity * 100).toFixed(2)}%`,
         });
       });
 
