@@ -4,18 +4,24 @@ import { DiscordService } from "./DiscordService";
 import { EmbeddingService } from "./EmbeddingService";
 import { PineconeService } from "./PineconeService";
 import { Logger } from "../utils/logger";
+import { RedactionService } from "./RedactionService";
+import { GeminiService } from "./GeminiService";
 
 export class TicketService {
   private discordService: DiscordService;
   private embeddingService: EmbeddingService;
   private pineconeService: PineconeService;
   private logger: Logger;
+  private redactionService: RedactionService;
+  private geminiService: GeminiService;
 
-  constructor(discordService: DiscordService, embeddingService: EmbeddingService, pineconeService: PineconeService, logger: Logger) {
+  constructor(discordService: DiscordService, embeddingService: EmbeddingService, pineconeService: PineconeService, logger: Logger, redactionService: RedactionService, geminiService: GeminiService) {
     this.discordService = discordService;
     this.embeddingService = embeddingService;
     this.pineconeService = pineconeService;
     this.logger = logger;
+    this.redactionService = redactionService;
+    this.geminiService = geminiService;
   }
 
   async processTicketCreation(interaction: ModalSubmitInteraction): Promise<void> {

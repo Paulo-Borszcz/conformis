@@ -14,9 +14,10 @@ export class Config {
   static readonly PINECONE_API_KEY = process.env.PINECONE_API_KEY as string;
   static readonly PINECONE_ENVIRONMENT = process.env.PINECONE_ENVIRONMENT as string;
   static readonly PINECONE_INDEX = process.env.PINECONE_INDEX as string;
+  static readonly GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
   static validate(): void {
-    const requiredEnvVars = ["DISCORD_TOKEN", "DISCORD_CLIENT_ID", "DISCORD_GUILD_ID", "DISCORD_NOTIFICATION_CHANNEL_ID", "OPENAI_API_KEY", "PINECONE_API_KEY", "PINECONE_ENVIRONMENT", "PINECONE_INDEX"];
+    const requiredEnvVars = ["DISCORD_TOKEN", "DISCORD_CLIENT_ID", "DISCORD_GUILD_ID", "DISCORD_NOTIFICATION_CHANNEL_ID", "OPENAI_API_KEY", "PINECONE_API_KEY", "PINECONE_ENVIRONMENT", "PINECONE_INDEX", "GEMINI_API_KEY"];
 
     const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 

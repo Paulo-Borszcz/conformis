@@ -10,7 +10,10 @@
     "watch": "nodemon --exec ts-node src/app.ts"
   },
   "dependencies": {
+    "@discordjs/formatters": "^0.6.0",
+    "@google/generative-ai": "^0.24.0",
     "@pinecone-database/pinecone": "^5.1.1",
+    "axios": "^1.8.3",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "openai": "^4.24.1",
