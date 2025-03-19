@@ -36,7 +36,7 @@ export class ImageDescriptionService {
     try {
       const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
-      const prompt = `Descreva esta imagem de forma curta e objetiva, em no máximo 2 ou 3 linhas. A descrição deve ser em português e em itálico.`;
+      const prompt = `Descreva esta imagem de forma curta e objetiva, em no máximo 2 ou 3 linhas. A descrição deve ser em português e sem nenhuma formatação markdown.`;
 
       const mimeType = imageUrl.split(".").pop() || "image/png";
       const imagePart = await this.fileToGenerativePart(imageUrl, `image/${mimeType}`);

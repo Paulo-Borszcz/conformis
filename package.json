@@ -2,6 +2,7 @@
   "name": "rag",
   "version": "1.0.0",
   "description": "Bot de suporte para Discord com IA para encontrar problemas similares",
+  "author": "Paulo Felipe Borszcz",
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",

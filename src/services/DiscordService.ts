@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, ThreadChannel, TextChannel, EmbedBuilder, CommandInteraction, ChannelType, ColorResolvable, Message, Attachment } from "discord.js";
+import { Client, GatewayIntentBits, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, ThreadChannel, TextChannel, EmbedBuilder, CommandInteraction, ChannelType, ColorResolvable, Message, Attachment, ButtonBuilder, ButtonStyle } from "discord.js";
 import { blockQuote } from "@discordjs/formatters";
 import { Config } from "../utils/config";
 import { Ticket, TicketForm } from "../models/Ticket";
@@ -187,6 +187,9 @@ export class DiscordService {
         throw new Error("Canal de notificação não encontrado ou não é um canal de texto");
       }
 
+      const user = await this.client.users.fetch(ticket.userId);
+      const userAvatarURL = user.displayAvatarURL({ size: 128 });
+
       const formattedTime = new Date().toLocaleTimeString("pt-BR", {
         hour: "2-digit",
         minute: "2-digit",
@@ -196,6 +199,7 @@ export class DiscordService {
         .setColor(this.COLORS.NOTIFICATION)
         .setTitle(`${this.EMOJI.ALERT} Novo Ticket de Plantão`)
         .setDescription(`${this.EMOJI.TICKET} **Ticket** aberto por <@${ticket.userId}> às ${formattedTime}`)
+        .setThumbnail(userAvatarURL)
         .addFields(
           {
             name: "Sobre",
@@ -211,19 +215,23 @@ export class DiscordService {
             name: "Filial",
             value: `\`${this.trimText(ticket.form.filialUsuarioDF.split(",")[0], 100) || "Não especificado"}\``,
             inline: true,
-          },
-          {
-            name: `${this.EMOJI.LINK} Link Rápido`,
-            value: ticket.threadId ? `[Acessar Thread](https://discord.com/channels/${Config.DISCORD_GUILD_ID}/${ticket.threadId})` : "Não disponível",
           }
         )
         .setTimestamp()
         .setFooter({
-          text: `Clique no link acima para acessar este ticket`,
+          text: `Use o botão abaixo para acessar este ticket`,
           iconURL: "https://cdn.discordapp.com/emojis/1037045289081905152.webp",
         });
 
-      await channel.send({ content: `<@&${Config.DISCORD_NOTIFICATION_CHANNEL_ID}>`, embeds: [notificationEmbed] });
+      const linkButton = new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(`${this.EMOJI.LINK} Acessar Ticket`).setURL(`https://discord.com/channels/${Config.DISCORD_GUILD_ID}/${ticket.threadId}`);
+
+      const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(linkButton);
+
+      await channel.send({
+        content: `<@&${ticket.userId}>`,
+        embeds: [notificationEmbed],
+        components: [actionRow],
+      });
     } catch (error) {
       this.logger.error("Erro ao enviar notificação", error);
     }
