@@ -43,7 +43,7 @@ export class PineconeService {
     }
   }
 
-  async findSimilarTickets(ticket: Ticket, topK: number = 3): Promise<{ id: string; threadId: string; similarity: number }[]> {
+  async findSimilarTickets(ticket: Ticket, topK: number = 3): Promise<{ id: string; content: string; threadId: string; similarity: number }[]> {
     try {
       if (!ticket.embeddings || ticket.embeddings.length === 0) {
         throw new Error("Ticket não possui embeddings para busca de similares");
@@ -59,15 +59,25 @@ export class PineconeService {
         },
       });
 
-      const results = (queryResponse.matches || []).map((match: { metadata: { ticketId: any; threadId: any }; score: any }) => {
-        return {
-          id: match.metadata.ticketId,
-          threadId: match.metadata.threadId,
-          similarity: match.score,
-        };
-      });
+      const results = (queryResponse.matches || []).map(
+        (match: {
+          metadata: {
+            content: any;
+            ticketId: any;
+            threadId: any;
+          };
+          score: any;
+        }) => {
+          return {
+            id: match.metadata.ticketId,
+            threadId: match.metadata.threadId,
+            similarity: match.score,
+            content: match.metadata.content,
+          };
+        }
+      );
 
-      const dedupedResults: { id: string; threadId: string; similarity: number }[] = Array.from(
+      const dedupedResults: { id: string; threadId: string; similarity: number; content: string }[] = Array.from(
         results
           .reduce((map: { get: (arg0: any) => any; set: (arg0: any, arg1: any) => void }, item: { id: any; similarity: number }) => {
             const existing = map.get(item.id);
@@ -78,6 +88,9 @@ export class PineconeService {
           }, new Map<string, (typeof results)[0]>())
           .values()
       );
+
+      // Ordena em ordem decrescente de similarity (dos mais parecidos para os menos)
+      dedupedResults.sort((a, b) => b.similarity - a.similarity);
 
       this.logger.info(`Encontrados ${dedupedResults.length} tickets similares para o ticket ${ticket.id}`);
       return dedupedResults;

@@ -21,7 +21,12 @@ export class Ticket {
   threadId?: string;
   createdAt: Date;
   embeddings?: TicketEmbedding[];
-  similarTickets?: { id: string; threadId: string; similarity: number }[];
+  similarTickets?: Array<{
+    content: string;
+    id: string;
+    threadId: string;
+    similarity: number;
+  }>;
 
   constructor(userId: string, username: string, form: TicketForm) {
     this.id = `ticket_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -49,7 +54,14 @@ export class Ticket {
     this.embeddings = embeddings;
   }
 
-  setSimilarTickets(similarTickets: { id: string; threadId: string; similarity: number }[]): void {
+  setSimilarTickets(
+    similarTickets: Array<{
+      content: string;
+      id: string;
+      threadId: string;
+      similarity: number;
+    }>
+  ): void {
     this.similarTickets = similarTickets;
   }
 }

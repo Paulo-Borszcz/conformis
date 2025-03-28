@@ -9,6 +9,9 @@ import * as questionCommand from "./commands/question";
 import readyEvent from "./events/ready";
 import interactionCreateEvent from "./events/InteractionCreate";
 import { generateInviteUrl } from "./utils/inviteUrl";
+import { RedactionService } from "./services/RedactionService";
+import { GeminiService } from "./services/GeminiService";
+import { ImageDescriptionService } from "./services/ImageDescriptionService";
 
 export class Bot {
   private client: Client;
@@ -17,18 +20,30 @@ export class Bot {
   private embeddingService: EmbeddingService;
   private pineconeService: PineconeService;
   private ticketService: TicketService;
+  private redactionService: RedactionService;
+  private geminiService: GeminiService;
+  private imageDescriptionService: ImageDescriptionService;
 
   constructor() {
     this.logger = new Logger();
+
+    // Inicializa serviços auxiliares primeiro
+    this.redactionService = new RedactionService(this.logger);
+    this.geminiService = new GeminiService(this.logger);
+    this.imageDescriptionService = new ImageDescriptionService(this.logger);
 
     this.client = new Client({
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
     });
 
-    this.discordService = new DiscordService(this.client, this.logger);
-    this.embeddingService = new EmbeddingService(this.logger);
+    // Inicializa serviços principais com dependências
+    this.discordService = new DiscordService(this.client, this.logger, this.geminiService, this.imageDescriptionService);
+
+    this.embeddingService = new EmbeddingService(this.logger, this.redactionService);
+
     this.pineconeService = new PineconeService(this.logger);
-    this.ticketService = new TicketService(this.discordService, this.embeddingService, this.pineconeService, this.logger);
+
+    this.ticketService = new TicketService(this.discordService, this.embeddingService, this.pineconeService, this.logger, this.redactionService, this.geminiService);
 
     this.registerEvents();
   }
@@ -84,6 +99,8 @@ export class Bot {
 
   async start(): Promise<void> {
     try {
+      Config.validate();
+
       await this.client.login(Config.DISCORD_TOKEN);
       this.logger.info("Bot logado com sucesso");
 
@@ -93,7 +110,7 @@ export class Bot {
       this.logger.info("Bot iniciado com sucesso");
     } catch (error) {
       this.logger.error("Erro ao iniciar o bot", error);
-      throw error;
+      process.exit(1);
     }
   }
 }

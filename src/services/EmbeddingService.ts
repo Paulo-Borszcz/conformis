@@ -2,23 +2,27 @@ import OpenAI from "openai";
 import { Config } from "../utils/config";
 import { Ticket, TicketEmbedding } from "../models/Ticket";
 import { Logger } from "../utils/logger";
+import { RedactionService } from "./RedactionService";
 
 export class EmbeddingService {
   private openai: OpenAI;
   private logger: Logger;
+  private redactionService: RedactionService;
 
-  constructor(logger: Logger) {
+  constructor(logger: Logger, redactionService: RedactionService) {
     this.openai = new OpenAI({
       apiKey: Config.OPENAI_API_KEY,
     });
     this.logger = logger;
+    this.redactionService = redactionService;
   }
 
   async generateEmbeddings(ticket: Ticket): Promise<TicketEmbedding[]> {
     try {
       const ticketText = ticket.toText();
+      const redactedText = this.redactionService.redactSensitiveInfo(ticketText);
 
-      const chunks = this.splitTextIntoChunks(ticketText);
+      const chunks = this.splitTextIntoChunks(redactedText);
 
       const embeddings: TicketEmbedding[] = [];
 
