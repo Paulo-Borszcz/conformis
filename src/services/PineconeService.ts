@@ -89,6 +89,9 @@ export class PineconeService {
           .values()
       );
 
+      // Ordena em ordem decrescente de similarity (dos mais parecidos para os menos)
+      dedupedResults.sort((a, b) => b.similarity - a.similarity);
+
       this.logger.info(`Encontrados ${dedupedResults.length} tickets similares para o ticket ${ticket.id}`);
       return dedupedResults;
     } catch (error) {
