@@ -27,7 +27,6 @@ export class Bot {
   constructor() {
     this.logger = new Logger();
 
-    // Inicializa serviços auxiliares primeiro
     this.redactionService = new RedactionService(this.logger);
     this.geminiService = new GeminiService(this.logger);
     this.imageDescriptionService = new ImageDescriptionService(this.logger);
@@ -36,7 +35,6 @@ export class Bot {
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
     });
 
-    // Inicializa serviços principais com dependências
     this.discordService = new DiscordService(this.client, this.logger, this.geminiService, this.imageDescriptionService);
 
     this.embeddingService = new EmbeddingService(this.logger, this.redactionService);

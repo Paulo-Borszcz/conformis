@@ -25,20 +25,25 @@ export class TicketService {
   }
 
   async processTicketCreation(interaction: ModalSubmitInteraction): Promise<void> {
+    let thread: ThreadChannel | null = null;
+    let ticket: Ticket | null = null;
+
     try {
       const formData = this.discordService.extractFormData(interaction);
-
-      const ticket = new Ticket(interaction.user.id, interaction.user.username, formData);
+      ticket = new Ticket(interaction.user.id, interaction.user.username, formData);
 
       await interaction.reply({
         content: "Seu ticket está sendo processado, aguarde um momento...",
         ephemeral: true,
       });
 
-      const thread = await this.discordService.createTicketThread(interaction, ticket);
+      thread = await this.discordService.createTicketThread(interaction, ticket);
+      if (!thread) {
+        throw new Error("Falha ao criar a thread do ticket.");
+      }
       ticket.setThreadId(thread.id);
 
-      await this.discordService.sendNotification(ticket);
+      await this.discordService.sendNotifications(ticket);
 
       const embeddings = await this.embeddingService.generateEmbeddings(ticket);
       ticket.setEmbeddings(embeddings);
@@ -54,16 +59,23 @@ export class TicketService {
         content: `Seu ticket foi criado com sucesso! Acompanhe o tópico: <#${thread.id}>`,
       });
 
-      this.logger.info(`Ticket ${ticket.id} processado com sucesso`);
+      this.logger.info(`Ticket ${ticket.threadId} processado com sucesso para usuário ${ticket.userId}`);
     } catch (error) {
-      this.logger.error("Erro ao processar ticket", error);
+      this.logger.error("Erro ao processar criação de ticket:", error);
 
       try {
-        await interaction.editReply({
-          content: "Ocorreu um erro ao processar seu ticket. Por favor, tente novamente ou contate um administrador.",
-        });
+        if (interaction.replied || interaction.deferred) {
+          await interaction.editReply({
+            content: "Ocorreu um erro inesperado ao processar seu ticket. A equipe foi notificada. Por favor, tente novamente mais tarde ou contate um administrador se o problema persistir.",
+          });
+        } else {
+          await interaction.reply({
+            content: "Ocorreu um erro inesperado ao processar seu ticket. A equipe foi notificada.",
+            ephemeral: true,
+          });
+        }
       } catch (replyError) {
-        this.logger.error("Erro ao enviar resposta de erro", replyError);
+        this.logger.error("Erro adicional ao tentar enviar mensagem de erro ao usuário:", replyError);
       }
     }
   }

@@ -4,6 +4,7 @@ import { GeminiService } from "./GeminiService";
 import { ImageDescriptionService } from "./ImageDescriptionService";
 import { ImageHandlerService } from "./discord/ImageHandlerService";
 import { ModalService } from "./discord/ModalService";
+// Importa o NotificationService (que agora é o orquestrador)
 import { NotificationService } from "./discord/NotificationService";
 import { SimilarTicketsService } from "./discord/SimilarTicketsService";
 import { ThreadService } from "./discord/ThreadService";
@@ -19,6 +20,7 @@ export class DiscordService {
   private imageHandlerService: ImageHandlerService;
   private modalService: ModalService;
   private threadService: ThreadService;
+  // Mantém a instância do NotificationService (orquestrador)
   private notificationService: NotificationService;
   private similarTicketsService: SimilarTicketsService;
 
@@ -51,8 +53,13 @@ export class DiscordService {
     return this.threadService.createTicketThread(interaction, ticket);
   }
 
-  async sendNotification(ticket: Ticket) {
-    return this.notificationService.sendNotification(this.client, ticket);
+  async sendNotifications(ticket: Ticket): Promise<void> {
+    if (!ticket || !ticket.threadId) {
+      this.logger.warn(`[DiscordService] Tentativa de enviar notificações para ticket inválido ou sem threadId. Ticket Data: ${JSON.stringify(ticket)}`);
+      return;
+    }
+    this.logger.info(`[DiscordService] Solicitando envio de notificações para ticket ${ticket.threadId}`);
+    await this.notificationService.sendNotificationsForNewTicket(this.client, ticket);
   }
 
   async addSimilarTicketsToThread(ticket: Ticket) {
