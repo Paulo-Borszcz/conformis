@@ -266,7 +266,6 @@ src/
 
 <div align="center">
 <h3>👨‍💻 Para Usuários</h3>
-</div>
 
 <table>
 <tr>
@@ -362,6 +361,7 @@ Veja tickets similares e respostas
 </td>
 </tr>
 </table>
+</div>
 
 ---
 
