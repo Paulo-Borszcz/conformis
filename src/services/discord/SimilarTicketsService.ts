@@ -47,11 +47,9 @@ export class SimilarTicketsService {
       for (let i = 0; i < length; i++) {
         const similarTicket = ticket.similarTickets[i];
 
-        const summary = await this.geminiService.generateCaseSummary(similarTicket.content);
-
         similarTicketsEmbed.addFields({
           name: `${i + 1}. Ticket Similar (${(similarTicket.similarity * 100).toFixed(0)}%)`,
-          value: blockQuote(`\`${summary}\``),
+          value: " ",
         });
 
         const button = new ButtonBuilder()

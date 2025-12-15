@@ -1,7 +1,6 @@
 import { Client } from "discord.js";
 import { Logger } from "../utils/logger";
 import { GeminiService } from "./GeminiService";
-import { ImageDescriptionService } from "./ImageDescriptionService";
 import { ImageHandlerService } from "./discord/ImageHandlerService";
 import { ModalService } from "./discord/ModalService";
 // Importa o NotificationService (que agora é o orquestrador)
@@ -15,7 +14,6 @@ export class DiscordService {
   private client: Client;
   private logger: Logger;
   private geminiService: GeminiService;
-  private imageDescriptionService: ImageDescriptionService;
 
   private imageHandlerService: ImageHandlerService;
   private modalService: ModalService;
@@ -24,13 +22,12 @@ export class DiscordService {
   private notificationService: NotificationService;
   private similarTicketsService: SimilarTicketsService;
 
-  constructor(client: Client, logger: Logger, geminiService: GeminiService, imageDescriptionService: ImageDescriptionService) {
+  constructor(client: Client, logger: Logger, geminiService: GeminiService) {
     this.client = client;
     this.logger = logger;
     this.geminiService = geminiService;
-    this.imageDescriptionService = imageDescriptionService;
 
-    this.imageHandlerService = new ImageHandlerService(logger, imageDescriptionService);
+    this.imageHandlerService = new ImageHandlerService(logger);
     this.modalService = new ModalService();
     this.threadService = new ThreadService(logger);
     this.notificationService = new NotificationService(logger);

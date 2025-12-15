@@ -11,7 +11,6 @@ import interactionCreateEvent from "./events/InteractionCreate";
 import { generateInviteUrl } from "./utils/inviteUrl";
 import { RedactionService } from "./services/RedactionService";
 import { GeminiService } from "./services/GeminiService";
-import { ImageDescriptionService } from "./services/ImageDescriptionService";
 
 export class Bot {
   private client: Client;
@@ -22,20 +21,18 @@ export class Bot {
   private ticketService: TicketService;
   private redactionService: RedactionService;
   private geminiService: GeminiService;
-  private imageDescriptionService: ImageDescriptionService;
 
   constructor() {
     this.logger = new Logger();
 
     this.redactionService = new RedactionService(this.logger);
     this.geminiService = new GeminiService(this.logger);
-    this.imageDescriptionService = new ImageDescriptionService(this.logger);
 
     this.client = new Client({
       intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
     });
 
-    this.discordService = new DiscordService(this.client, this.logger, this.geminiService, this.imageDescriptionService);
+    this.discordService = new DiscordService(this.client, this.logger, this.geminiService);
 
     this.embeddingService = new EmbeddingService(this.logger, this.redactionService);
 
@@ -72,7 +69,7 @@ export class Bot {
       const commands = [questionCommand.data.toJSON()];
       const rest = new REST({ version: "10" }).setToken(Config.DISCORD_TOKEN);
 
-      this.logger.info("Iniciando registro de comandos (/)");
+      this.logger.info("Iniciando registro de comandos (/")
 
       try {
         this.logger.info("Tentando registrar comandos globalmente...");
